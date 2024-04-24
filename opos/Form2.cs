@@ -47,8 +47,21 @@ namespace opos
                 MessageBox.Show("Podaj liczby całkowite");
                 return;
             }
-            Form3 form3 = new Form3(rows, columns);
+
+            int numberOfDydelfs;
+            if (!int.TryParse(textBox1.Text, out numberOfDydelfs))
+            {
+                MessageBox.Show("Podaj liczbę całkowitą dla liczby Dydelfów");
+                return;
+            }
+
+            Form3 form3 = new(rows, columns, numberOfDydelfs);
             form3.Show();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

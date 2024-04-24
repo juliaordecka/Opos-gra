@@ -18,13 +18,14 @@ namespace opos
             InitializeComponent();
             
         }
-        int rows, columns, dydelfRows, dydelfColumns;
+        int rows, columns, dydelfRows, dydelfColumns, numberOfDydelfs;
         
-        public Form3(int rows, int columns)
+        public Form3(int rows, int columns, int numberOfDydelfs)
         {
             InitializeComponent();
             this.rows = rows;
             this.columns = columns;
+            this.numberOfDydelfs=numberOfDydelfs;
             createButtons(rows, columns);
             PlaceDydelf(rows, columns);
         }
@@ -41,9 +42,11 @@ namespace opos
                 for (int j = 0; j < rows; j++)
                 {
                     Button button = new Button();
-                    //button.Text = "Button " + i + " " + j;
+                    button.Name = $"button_{i}_{j}";
                     button.Location = new Point(10 + i * 100, 10 + j * 100);
                     button.Size = new Size(80, 80);
+                    button.BackColor = Color.Gray;
+                    button.Click += button_Click;
                     this.Controls.Add(button);
                 }
             }
@@ -63,16 +66,42 @@ namespace opos
                 MessageBox.Show("Puste pole");
             }
         }
-
+        //set random dydelf placement
+        //ZLEEEEEEEEEEEEEEEEEEEEEEE 
         private void PlaceDydelf(int rows, int columns)
         {
-            dydelfRows = random.Next(0, rows);
-            dydelfColumns = random.Next(0, columns);
-            Button button = new Button();
-            button.Text = "Dydelf";
-            button.Location = new Point(10 + dydelfColumns * 100, 10 + dydelfRows * 100);
-            button.Size = new Size(80, 80);
-            this.Controls.Add(button);
+            for (int k = 0; k < numberOfDydelfs; k++)
+            {
+                int dydelfRow = random.Next(0, rows);
+                int dydelfColumn = random.Next(0, columns);
+                Button button = (Button)this.Controls.Find($"button_{dydelfColumn}_{dydelfRow}", true).FirstOrDefault();
+                if (button != null && button.Text != "Dydelf")
+                {
+                    button.Text = "Dydelf";
+                }
+                else
+                {
+                    k--; // If the position already has a Dydelf, repeat the loop
+                }
+            }
         }
+        //to zmodyfikowac zeby dzialalo dla ilosci dydelfow wprowadzonych przez uzytkownika
+        //after clicking the generated buttons check if dydelf is found - applies to all generated buttons
+        private void button_Click(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            if (button.Location.X == 10 + dydelfColumns * 100 && button.Location.Y == 10 + dydelfRows * 100)
+            {
+                button.Text="Dydelf znaleziony";
+                button.Enabled = false;
+            }
+            else
+            {
+                button.Text="Puste pole";
+                button.Enabled = false;
+            }
+        }
+
+
     }
 }
