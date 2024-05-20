@@ -2,6 +2,12 @@ namespace opos
 {
     public partial class Form1 : Form
     {
+
+        public int x = 3;
+        public int y = 3;
+        public int dydelfy = 1;
+        public int krokodyle = 1;
+        public int czas = 30;
         public Form1()
         {
             InitializeComponent();
@@ -20,14 +26,15 @@ namespace opos
         //start
         private void button1_Click(object sender, EventArgs e)
         {
-            Form F3 = new Form3();
-            F3.Show();
+            Form3 nowe_okno = new Form3(this);
+            nowe_okno.Show();
+            nowe_okno.GameBoard();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Form F2 = new Form2();
-            F2.Show();
+            Form2 nowe_okno = new Form2(this);
+            nowe_okno.ShowDialog(); ;
    
             
         }

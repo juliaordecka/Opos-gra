@@ -13,9 +13,12 @@ namespace opos
 
     public partial class Form2 : Form
     {
-        public Form2()
+
+        Form1 parent;
+        public Form2(Form1 okno)
         {
             InitializeComponent();
+            parent = okno; 
         }
 
 
@@ -41,27 +44,38 @@ namespace opos
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int rows, columns;
-            if (!int.TryParse(textBox4.Text, out rows) || !int.TryParse(textBox5.Text, out columns))
-            {
-                MessageBox.Show("Podaj liczby całkowite");
-                return;
-            }
+           
+            int domyslneX = 3;
+            int domyslneY = 3;
+            int domyslneDydelfy = 1;
+            int domyslneKrokodyle = 1;
+            int domyslnyCzas = 30;
 
-            int numberOfDydelfs;
-            if (!int.TryParse(textBox1.Text, out numberOfDydelfs))
-            {
-                MessageBox.Show("Podaj liczbę całkowitą dla liczby Dydelfów");
-                return;
-            }
+            
+            int wprowadzoneX = string.IsNullOrWhiteSpace(textBox4.Text) ? domyslneX : int.Parse(textBox4.Text);
+            int wprowadzoneY = string.IsNullOrWhiteSpace(textBox5.Text) ? domyslneY : int.Parse(textBox5.Text);
+            int wprowadzoneDydelfy = string.IsNullOrWhiteSpace(textBox1.Text) ? domyslneDydelfy : int.Parse(textBox1.Text);
+            int wprowadzoneKrokodyle = string.IsNullOrWhiteSpace(textBox2.Text) ? domyslneKrokodyle : int.Parse(textBox2.Text);
+            int wprowadzonyCzas = string.IsNullOrWhiteSpace(textBox3.Text) ? domyslnyCzas : int.Parse(textBox3.Text);
 
-            Form3 form3 = new(rows, columns, numberOfDydelfs);
-            form3.Show();
+          
+            if (wprowadzoneX <= 10 && wprowadzoneY <= 10 && wprowadzoneDydelfy + wprowadzoneKrokodyle <= wprowadzoneX * wprowadzoneY && wprowadzonyCzas > 0)
+            {
+               
+                parent.x = wprowadzoneX;
+                parent.y = wprowadzoneY;
+                parent.dydelfy = wprowadzoneDydelfy;
+                parent.krokodyle = wprowadzoneKrokodyle;
+                parent.czas = wprowadzonyCzas;
+
+                Close();
+            }
+            else
+            {
+                label7.Text = "wprowadz poprawne dane";
+            }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
 
-        }
     }
 }

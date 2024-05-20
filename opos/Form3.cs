@@ -1,107 +1,172 @@
-﻿using System;
+﻿using opos.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+//START 
 
 namespace opos
 {
     public partial class Form3 : Form
     {
-        Random random = new Random();
-        public Form3()
+        Form1 parent;
+        private int czasOdmierzania;
+
+        public Form3(Form1 okno)
         {
             InitializeComponent();
-            
-        }
-        int rows, columns, dydelfRows, dydelfColumns, numberOfDydelfs;
-        
-        public Form3(int rows, int columns, int numberOfDydelfs)
-        {
-            InitializeComponent();
-            this.rows = rows;
-            this.columns = columns;
-            this.numberOfDydelfs=numberOfDydelfs;
-            createButtons(rows, columns);
-            PlaceDydelf(rows, columns);
+            parent = okno;
+            czasOdmierzania = parent.czas;
+            timer.Interval = 1000;
+            timer.Tick += timer1_Tick;
+
+            timer.Start();
+
         }
 
+        private int znalezione_dydelfy;
+        private bool koniec_gry;
+        private System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+
+        int x = 0;
+        int y = 100;
+        private PictureBox[,] pictureBoxes; 
+        List<Tuple<int, int>> listaDydelfow = new List<Tuple<int, int>>();
+        List<Tuple<int, int>> listaKrokodylow = new List<Tuple<int, int>>();
+
+        public void GameBoard()
+        {
+            pictureBoxes = new PictureBox[parent.y, parent.x];
+            for (int i = 0; i < parent.y; i++)
+            {
+                for (int j = 0; j < parent.x; j++)
+                {
+                    PictureBox pictureBox = new PictureBox();
+                    pictureBox.Location = new Point(x, y);
+                    x = x + 170;
+               
+                    pictureBox.Size = new Size(100, 100);
+                    pictureBox.Image = Resources.garbage_can;
+                    pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                    Controls.Add(pictureBox);
+                    
+                    pictureBoxes[i, j] = pictureBox;
+                  
+                    pictureBox.Click += PictureBox_Click;
+                }
+                y = y + 170;
+                x = 0;
+            }
+
+            int totalFields = parent.y * parent.x;
+
+            for (int i = 0; i < parent.dydelfy; i++)
+            {
+                Random random = new Random();
+                int randomRow = random.Next(1, parent.y);
+                int randomColumn = random.Next(1, parent.x);
+                listaDydelfow.Add(new Tuple<int, int>(randomRow, randomColumn));
+            }
+
+            for (int i = 0; i < parent.krokodyle; i++)
+            {
+                Tuple<int, int> krokodylTuple;
+                do
+                {
+                    Random random = new Random();
+                    int randomRow = random.Next(1, parent.y);
+                    int randomColumn = random.Next(1, parent.x);
+                    krokodylTuple = new Tuple<int, int>(randomRow, randomColumn);
+                } while (listaDydelfow.Contains(krokodylTuple));
+                listaKrokodylow.Add(krokodylTuple);
+            }
+        }
+
+        private void PictureBox_Click(object sender, EventArgs e)
+        {
+            PictureBox clickedPictureBox = (PictureBox)sender;
+            int clickedRowIndex = -1;
+            int clickedColumnIndex = -1;
+            bool isClickedDydelf = false;
+            bool isClickedKrokodyl = false;
+            for (int i = 0; i < parent.y; i++)
+            {
+                for (int j = 0; j < parent.x; j++)
+                {
+                    if (pictureBoxes[i, j] == clickedPictureBox)
+                    {
+                        clickedRowIndex = i;
+                        clickedColumnIndex = j;
+                        var clickedBox = Tuple.Create(j, i);
+                        isClickedDydelf = listaDydelfow.Contains(clickedBox);
+                        isClickedKrokodyl = listaKrokodylow.Contains(clickedBox);
+                        break;
+                    }
+                }
+                if (clickedRowIndex != -1)
+                    break;
+            }
+
+            if (isClickedDydelf)
+            {
+                clickedPictureBox.Image = Resources.possum;
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                znalezione_dydelfy++;
+                if (znalezione_dydelfy == parent.dydelfy && !koniec_gry)
+                {
+                    koniec_gry = true;
+                    label3.Text = "gratulacje";
+                    timer.Stop();
+                }
+            }
+            else if (isClickedKrokodyl)
+            {
+                clickedPictureBox.Image = Resources.krokodyl;
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+                if (!koniec_gry)
+                {
+                    koniec_gry = true;
+                    label3.Text = "przegrales";
+                    timer.Stop();
+                }
+            }
+            else
+            {
+                clickedPictureBox.Image = Resources.nic;
+                clickedPictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            czasOdmierzania--;
+
+            label2.Text = czasOdmierzania.ToString() + " s";
+
+            if (czasOdmierzania <= 0)
+            {
+                timer.Stop();
+
+                label3.Text = "koniec czasu";
+                koniec_gry = true;
+            }
+        }
         private void button1_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void createButtons(int rows, int columns)
+        private void label2_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < columns; i++)
-            {
-                for (int j = 0; j < rows; j++)
-                {
-                    Button button = new Button();
-                    button.Name = $"button_{i}_{j}";
-                    button.Location = new Point(10 + i * 100, 10 + j * 100);
-                    button.Size = new Size(80, 80);
-                    button.BackColor = Color.Gray;
-                    button.Click += button_Click;
-                    this.Controls.Add(button);
-                }
-            }
+
         }
-
-
-
-        private void Button_Click(object sender, EventArgs e)
-        {
-            Button button = (Button)sender;
-            if (button.Location.X == 10 + dydelfColumns * 100 && button.Location.Y == 10 + dydelfRows * 100)
-            {
-                MessageBox.Show("Dydelf znaleziony");
-            }
-            else
-            {
-                MessageBox.Show("Puste pole");
-            }
-        }
-        //set random dydelf placement
-        //ZLEEEEEEEEEEEEEEEEEEEEEEE 
-        private void PlaceDydelf(int rows, int columns)
-        {
-            for (int k = 0; k < numberOfDydelfs; k++)
-            {
-                int dydelfRow = random.Next(0, rows);
-                int dydelfColumn = random.Next(0, columns);
-                Button button = (Button)this.Controls.Find($"button_{dydelfColumn}_{dydelfRow}", true).FirstOrDefault();
-                if (button != null && button.Text != "Dydelf")
-                {
-                    button.Text = "Dydelf";
-                }
-                else
-                {
-                    k--; // If the position already has a Dydelf, repeat the loop
-                }
-            }
-        }
-        //to zmodyfikowac zeby dzialalo dla ilosci dydelfow wprowadzonych przez uzytkownika
-        //after clicking the generated buttons check if dydelf is found - applies to all generated buttons
-        private void button_Click(object sender, EventArgs e)
-        {
-            Button button = (Button)sender;
-            if (button.Location.X == 10 + dydelfColumns * 100 && button.Location.Y == 10 + dydelfRows * 100)
-            {
-                button.Text="Dydelf znaleziony";
-                button.Enabled = false;
-            }
-            else
-            {
-                button.Text="Puste pole";
-                button.Enabled = false;
-            }
-        }
-
-
     }
 }
+    
