@@ -1,0 +1,3 @@
+Gra polegająca na znalezieniu oposa na planszy składającej się z interaktywnych elementów. Pierwotnie przedstawiają one obrazek śmietnika, po kliknięciu na element następuje zmiana jego stanu i odkrycie zawartości, która się pod nim znajduje - może to być puste pole, opos lub krokodyl. Pozycje oposa i krokodyla są losowe dla każdej rozgrywki. 
+Gra jest ograniczona czasowo, kończy się zwycięstwem, jeśli w określonym czasie dydelf zostanie odnaleziony na planszy. Gracz przegrywa, gdy czas dobiegnie końca lub natrafi na Krokodyla.
+W obu przypadkach okno z planszą zostaje zablokowane, a gracz otrzymuje komunikat informujący o wyniku rozgrywki.
